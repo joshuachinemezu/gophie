@@ -56,6 +56,7 @@ type Engine interface {
 func Scrape(engine Engine) ([]Movie, error) {
 	// Config Vars
 	seleniumURL := fmt.Sprintf("%s/wd/hub", viper.GetString("selenium-url"))
+	log.Info("URL ", seleniumURL)
 	cacheDir := viper.GetString("cache-dir")
 	var (
 		t   *transport.Transport
@@ -70,7 +71,7 @@ func Scrape(engine Engine) ([]Movie, error) {
 
 	// Add Cloud Flare scraper bypasser
 	if engine.getName() == "NetNaija" {
-		log.Debug("Switching to Selenium transport")
+		log.Debug("Switching to Selenium transport...")
 		t, err = transport.NewSeleniumTransport(http.DefaultTransport, seleniumURL)
 		if err != nil {
 			log.Fatal(err)
@@ -100,7 +101,6 @@ func Scrape(engine Engine) ([]Movie, error) {
 	}
 
 	c.OnHTML(main, func(e *colly.HTMLElement) {
-		log.Info("Got Request ", e)
 		e.ForEach(article, func(_ int, el *colly.HTMLElement) {
 			movie, err := engine.parseSingleMovie(el, movieIndex)
 			if err != nil {
@@ -119,8 +119,7 @@ func Scrape(engine Engine) ([]Movie, error) {
 	})
 
 	c.OnResponse(func(r *colly.Response) {
-		log.Debugf("Done %v", r.Request.URL.String())
-		log.Info(string(r.Body))
+		log.Debugf("Done Visiting %v", r.Request.URL.String())
 	})
 
 	// Attach Movie Index to Context before making visits

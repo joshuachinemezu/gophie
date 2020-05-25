@@ -114,7 +114,6 @@ func initConfig() {
 	}
 
 	// Configs From Env
-
 	replacer := strings.NewReplacer("-", "_")
 	viper.SetEnvKeyReplacer(replacer)
 	viper.SetEnvPrefix("gophie") // will be uppercased automatically

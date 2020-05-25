@@ -1,16 +1,19 @@
 package engine
 
 import (
-	"fmt"
+	"os"
 	"strings"
 	"testing"
+
+	"github.com/spf13/viper"
 )
 
 func testResults(t *testing.T, engine Engine) {
+	viper.SetDefault("selenium-url", os.Getenv("GOPHIE_SELENIUM_URL"))
+
 	counter := map[string]int{}
 	var result SearchResult
 	var searchTerm string
-	fmt.Println(engine.String())
 	if !strings.HasPrefix(engine.String(), "TvSeries") {
 		searchTerm = "jumanji"
 	} else {
@@ -20,7 +23,6 @@ func testResults(t *testing.T, engine Engine) {
 	result = engine.Search(searchTerm)
 
 	if len(result.Movies) < 1 {
-		fmt.Println(engine.String())
 		t.Errorf("No movies returned from %v", engine.String())
 	} else {
 		for _, movie := range result.Movies {
@@ -42,8 +44,6 @@ func testResults(t *testing.T, engine Engine) {
 func TestEngines(t *testing.T) {
 	engines := GetEngines()
 	for _, engine := range engines {
-		if !strings.HasPrefix(engine.String(), "NetNaija") {
-			testResults(t, engine)
-		}
+		testResults(t, engine)
 	}
 }
